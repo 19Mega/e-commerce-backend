@@ -9,7 +9,9 @@ load_dotenv(find_dotenv())
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('MYSQL_URL', 'sqlite:///default.db')
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('MYSQL_URL', 'sqlite:///default.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://{os.environ.get('MYSQLUSER')}:{os.environ.get('MYSQLPASSWORD')}@{os.environ.get('MYSQLHOST')}:{os.environ.get('MYSQLPORT')}/{os.environ.get('MYSQLDATABASE')}"
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'default-secret')
@@ -28,5 +30,5 @@ with app.app_context():
     db.create_all()
 
 if __name__ == '__main__':
-    port = int(os.getenv("PORT", 5000))  # Asegúrate de convertir el puerto a entero
+    port = int(os.getenv("PORT", 5000))
     app.run(debug=True, port=port)
