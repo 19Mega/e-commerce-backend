@@ -9,12 +9,7 @@ load_dotenv(find_dotenv())
 
 app = Flask(__name__)
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('MYSQL_URL', 'sqlite:///default.db')
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://{os.getenv('MYSQLUSER')}:{os.getenv('MYSQLPASSWORD')}@{os.getenv('MYSQLHOST')}:{os.getenv('MYSQLPORT')}/{os.getenv('MYSQLDATABASE')}"
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'default-secret')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('MYSQLHOST', 'sqlite:///default.db')
 
 @app.route('/')
 def index():
