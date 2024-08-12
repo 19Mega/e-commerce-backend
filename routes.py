@@ -1,11 +1,10 @@
 import json
 from main import app, db
-from models import User ,Address, Payment , Product, Favorite, Cart, Order, OrderDetail, Advertising
-from datetime import datetime
+from models import User 
 
 from flask import request, jsonify
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import create_access_token, get_csrf_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token
 
 bcrypt = Bcrypt()
 
@@ -68,21 +67,11 @@ def login_user():
 
     access_token = create_access_token(identity= user.id)
     
-    favorites = Favorite.query.filter(Favorite.user_id == user.id).all()      
-    user_favorites = [favorite.serialize()['product_id'] for favorite in favorites]
-        
-    cart = Cart.query.filter(Cart.user_id == user.id).all()
-    user_cart = [{"id": cart.product_id, "quantity": cart.quantity} for cart in cart]
-    print(user_cart)
-    print(access_token)
-
     if user.is_admin:
         return jsonify(access_token= access_token, 
                 user_id= user.id,
                 user_name = user.name,
                 user_email = user.email,
-                user_favorites = user_favorites,
-                user_cart = user_cart,
                 user_admin = user.is_admin 
                 ), 200
 
@@ -90,116 +79,4 @@ def login_user():
                     user_id= user.id,
                     user_name = user.name,
                     user_email = user.email,
-                    user_favorites = user_favorites,
-                    user_cart = user_cart   
                     ), 200
-
-@app.route('/user/<int:user_id>/verify', methods=['GET'])
-@jwt_required()
-def veify_admin_token(user_id): 
-    # verify user
-    current_user_id = get_jwt_identity()
-    if current_user_id == user_id:
-        user = User.query.filter_by(id=user_id).first()
-        if user.is_admin: 
-            return jsonify(user_admin = user.is_admin), 200
-    
-    return jsonify({"msg": "Unauthorized."}), 401
-
-# -----
-
-# -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
-# 🏡 Address : CREATE, READ, UPDATE, DELETE
-
-@app.route('/user/<int:user_id>/address', methods=['POST'])
-@jwt_required()
-def create_address(user_id):
-    
-    if user_id is None:
-        return jsonify({"msg": "Invalid user id"}), 404
-
-    # verify user
-    current_user_id = get_jwt_identity()
-    if current_user_id != user_id:
-        return jsonify({"msg": "Unauthorized."}), 401 
-    
-    body = json.loads(request.data)
-    
-    new_address = Address(
-        user_id = user_id,
-        name_surname = body["name_surname"],
-        phone = body["phone"],
-        department = body["department"],
-        city = body["city"],
-        street = body["street"],
-        street_number = body["street_number"],
-        no_number = body["no_number"],
-        references = body["references"]
-    )
-    db.session.add(new_address)
-    db.session.commit()
-    
-    new_address_id = new_address.id
-    
-    return jsonify({"address_id": new_address_id}), 201
-
-@app.route('/user/<int:user_id>/address', methods=['GET'])
-@jwt_required()
-def get_addresses(user_id):
-    
-    # verify user
-    current_user_id = get_jwt_identity()
-    if current_user_id != user_id:
-        return jsonify({"msg": "Unauthorized."}), 401
-    
-    addresses = Address.query.filter_by(user_id= user_id).all()
-    return jsonify([address.serialize() for address in addresses]), 200
-  
-@app.route('/user/<int:user_id>/address/<int:address_id>', methods=['PUT'])
-@jwt_required()
-def update_address(user_id, address_id):
-    
-    # verify user
-    current_user_id = get_jwt_identity()
-    if current_user_id != user_id:
-        return jsonify({"msg": "Unauthorized."}), 401
-    
-    # addres exist?
-    user_address = Address.query.filter_by(user_id= user_id, id= address_id).first()
-    if not user_address:
-        return jsonify({"msg": "Address not found."}), 404
-    
-    body = json.loads(request.data)
-    
-    address = Address.query.get(address_id)
-    address.user_id = user_id
-    address.name_surname = body["name_surname"]
-    address.phone = body["phone"]
-    address.department = body["department"]
-    address.city = body["city"]
-    address.street = body["street"]
-    address.street_number = body["street_number"]
-    address.no_number = body["no_number"]
-    address.references = body["references"]
-    db.session.commit()
-    
-    return jsonify({"msg": "Address updated."}), 200
-
-@app.route('/user/<int:user_id>/address/<int:address_id>', methods=['DELETE'])
-@jwt_required()
-def delete_address(user_id, address_id):
-    
-    # verify user
-    current_user_id = get_jwt_identity()
-    if current_user_id != user_id:
-        return jsonify({"msg": "Unauthorized."}), 401
-    
-    # addres exist?
-    user_address = Address.query.filter_by(user_id= user_id, id= address_id).first()
-    if not user_address:
-        return jsonify({"msg": "Address not found."}), 404
-    
-    db.session.delete(user_address)
-    db.session.commit()
-    
-    return jsonify({"msg": "Address deleted."}), 200
