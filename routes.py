@@ -1,4 +1,6 @@
 from main import app, db
+from models import User 
+
 
 # -----
 
@@ -10,7 +12,7 @@ def create_table():
 @app.route('/insert_user')
 def insert_user():
     
-    new_user = User(name="Juan")
+    new_user = User(name="Juan", email="juan@gmail.com")
     db.session.add(new_user)
     db.session.commit()
     return "Usuario insertado!"
