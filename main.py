@@ -2,16 +2,19 @@ from flask import Flask, jsonify
 import os
 from dotenv import load_dotenv, find_dotenv
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
-
 
 load_dotenv(find_dotenv())
 
 app = Flask(__name__)
 
+db_user = os.getenv('MYSQLUSER')
+db_password = os.getenv('MYSQLPASSWORD')
+db_host = os.getenv('MYSQLHOST')
+db_port = os.getenv('MYSQLPORT')
+db_name = os.getenv('MYSQLDATABASE')
+
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('MYSQL_URL', 'sqlite:///default.db')
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('MYSQL_URL')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://MYSQLUSER:MYSQLPASSWORD@MYSQLHOST/MYSQLDATABASE'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 @app.route('/')
@@ -19,7 +22,6 @@ def index():
     return jsonify({"Choo Choo": f"Welcome to your Flask app 🚅{os.getenv('TEST', 'No test value')}"})
 
 
-jwt = JWTManager(app)
 db = SQLAlchemy(app)
 
 from routes import *
