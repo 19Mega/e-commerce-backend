@@ -1,8 +1,6 @@
 from enum import Enum
-from flask_sqlalchemy import SQLAlchemy
-from main import app
+from main import db
 
-db = SQLAlchemy(app)
 
 class DeliveryState(Enum):
     PENDING = "Pending"
