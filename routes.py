@@ -1,7 +1,7 @@
 import json
 
 from main import app, db
-from models import User 
+from models import User, Address, Payment , Product, Favorite, Cart, Order, OrderDetail, Advertising
 from flask import request, jsonify
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, get_csrf_token, jwt_required, get_jwt_identity
