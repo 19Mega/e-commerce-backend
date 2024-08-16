@@ -1,12 +1,14 @@
 import os
 import pymysql
 
-from flask import Flask, jsonify
+from flask import Flask
 from dotenv import load_dotenv, find_dotenv
 from flask_sqlalchemy import SQLAlchemy
 
 from datetime import timedelta 
 from flask_jwt_extended import JWTManager
+
+from flask_cors import CORS
 
 load_dotenv(find_dotenv())
 
@@ -17,6 +19,19 @@ app = Flask(__name__)
 
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
 jwt = JWTManager(app)
+
+CORS(
+    app,
+    resources={r"/*": {
+        "origins": [
+            "https://e-commerce-frontend-production.up.railway.app",
+            "http://127.0.0.1:5000" 
+        ],
+        "supports_credentials": True
+    }},
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"]
+)
 
 db_user = os.getenv('MYSQLUSER')
 db_password = os.getenv('MYSQLPASSWORD')
