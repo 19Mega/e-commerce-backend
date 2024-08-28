@@ -11,27 +11,19 @@ bcrypt = Bcrypt()
 
 # -----
 
-@app.route('/')
-def index():
-    return jsonify({"Choo Choo": f"Welcome to your Flask app"})
+# @app.route('/')
+# def index():
+#     return jsonify({"Choo Choo": f"Welcome to your Flask app"})
 
-@app.route('/create_table')
-def create_table():
-    db.create_all()
-    return "Tabla creada!"
+# @app.route('/create_table')
+# def create_table():
+#     db.create_all()
+#     return "Tabla creada!"
 
-@app.route('/insert_user')
-def insert_user():
-    
-    new_user = User(name="Juan", email="juan@gmail.com")
-    db.session.add(new_user)
-    db.session.commit()
-    return "Usuario insertado!"
-
-@app.route('/delete_table')
-def delete_table():
-    db.drop_all()
-    return "Tabla eliminada!"
+# @app.route('/delete_table')
+# def delete_table():
+#     db.drop_all()
+#     return "Tabla eliminada!"
 
 # -----
 
@@ -53,7 +45,7 @@ def signup_user():
             email = body["email"],
             password = hashed_password,
             is_active = body["is_active"],
-            is_admin = True,
+            is_admin = False,
         )
         db.session.add(new_user)
         db.session.commit()
