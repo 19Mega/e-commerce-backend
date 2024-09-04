@@ -26,6 +26,7 @@ CORS(
     resources={r"/*": {
         "origins": [
             "https://e-commerce-frontend-production.up.railway.app",
+            "https://etec-nan-logic.shop"
             "http://127.0.0.1:5000" 
         ],
         "supports_credentials": True
