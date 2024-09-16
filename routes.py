@@ -800,6 +800,28 @@ def create_advertising(user_id):
         return jsonify({"msg": f"Error creating order: {str(e)}"}), 500
     
 
+@app.route('/admin/<int:user_id>/banner/<int:banner_id>/delete', methods=['DELETE'])
+@jwt_required()
+def delete_advertising(user_id, banner_id):
+    try:
+        current_user_id = get_jwt_identity()
+        if current_user_id == user_id:
+            user = User.query.filter_by(id=user_id).first()
+
+            if user.is_admin:
+                advertising = Advertising.query.filter_by(id=banner_id).first()
+                
+                if advertising:
+                    db.session.delete(advertising)
+                    db.session.commit()
+                    return jsonify({"msg": "Banner deleted successfully."}), 200
+                else:
+                    return jsonify({"msg": "Banner not found."}), 404
+
+        return jsonify({"msg": "Unauthorized access."}), 403
+
+    except Exception as e:
+        return jsonify({"msg": f"Error deleting banner: {str(e)}"}), 500
 
 
     
